@@ -1,0 +1,93 @@
+.popupBurger {
+  font-family: Inter, Arial, sans-serif;
+  position: fixed;
+  top: 0;
+  right: -100%;
+  display: flex;
+  width: 520px;
+  height: 100vh;
+  background-color: #202020;
+  visibility: hidden;
+  opacity: 1;
+  z-index: 1;
+  transition: all 1.1s cubic-bezier(0.46, 0.09, 0.57, 1.38) 0s;
+}
+
+.popupBurger_opened {
+  display: flex;
+  right: 0px;
+  visibility: visible;
+  opacity: 1;
+}
+
+.popupBurger_exit-button {
+  position: absolute;
+  right: 27px;
+  top: 27px;
+  width: 22px;
+  height: 22px;
+  transform: rotate(45deg);
+  user-select: none;
+}
+
+.popupBurger__container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.popupBurger__links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 159px 0 0;
+}
+
+.popupBurger__link {
+  margin-bottom: 28px;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 22px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.popupBurger__link_active {
+  border-bottom: 2px #fff solid;
+}
+
+.popupBurger__profile {
+  margin: 0 0 90px;
+  width: 100px;
+  height: 32px;
+  user-select: none;
+}
+
+@media screen and (min-width: 320px) and (max-width: 767px) {
+  .popupBurger {
+    width: 100%;
+    height: 100vh;
+  }
+
+  .popupBurger_exit-button {
+    right: 18px;
+    top: 18px;
+  }
+
+  .popupBurger__links {
+    margin: 144px 0 0;
+  }
+
+  .popupBurger__link {
+    margin-bottom: 24px;
+    font-size: 18px;
+    line-height: 22px;
+  }
+
+  .popupBurger__profile {
+    margin: 0 0 46px;
+  }
+}

@@ -1,0 +1,96 @@
+.header {
+  font-family: Inter, Arial, sans-serif;
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 74px;
+  background-color: #073042;
+  color: #fff;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.header_theme_dark {
+  background-color: #202020;
+  box-shadow: none;
+}
+
+.header__container {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin: 0 70px;
+}
+
+.header__logo {
+  width: 38px;
+  height: 38px;
+  user-select: none;
+}
+
+.header__links {
+  display: flex;
+  margin: 0 0 0 auto;
+}
+
+.header__link {
+  text-decoration: none;
+  z-index: 1;
+}
+
+.header__link-title {
+  display: flex;
+  justify-self: flex-end;
+  align-self: flex-end;
+  margin: 0 30px 0 0;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  color: #fff;
+}
+
+.header__button {
+  position: relative;
+  top: 2px;
+  width: 76px;
+  height: 32px;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  background-color: #3ddc84;
+  border: 1px solid #000;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 3px;
+}
+
+.header__profile {
+  width: 100px;
+  height: 32px;
+}
+
+@media screen and (max-width: 1279px) {
+  .header__container {
+    margin: 0 30px;
+  }
+}
+
+@media screen and (min-width: 320px) and (max-width: 767px) {
+  .header__container {
+    margin: 0 14px;
+  }
+
+  .header__link-title {
+    margin-right: 14px;
+    font-size: 10px;
+  }
+
+  .header__button {
+    width: 54px;
+    height: 26px;
+    font-size: 10px;
+  }
+}

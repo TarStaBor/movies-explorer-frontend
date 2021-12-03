@@ -1,0 +1,7 @@
+@import url("./vendor/normalize.css");
+@import url("./fonts/inter/inter.css");
+@import url("./components/Link-opacity/Link-opacity.css");
+
+html {
+  background-color: #202020;
+}

@@ -1,0 +1,21 @@
+.burger {
+  position: absolute;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  min-height: 38px;
+}
+
+.burger__button {
+  width: 28px;
+  height: 28px;
+  user-select: none;
+}
+
+@media screen and (min-width: 320px) and (max-width: 767px) {
+  .burger__button {
+    width: 22px;
+    height: 22px;
+  }
+}
