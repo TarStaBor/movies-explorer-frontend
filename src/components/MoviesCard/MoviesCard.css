@@ -47,13 +47,18 @@
   background-color: #f9f9f9;
   border-radius: 50%;
   user-select: none;
+  border: none;
 }
 
-.moviesCard__selecter_save {
+.moviesCard__selecter_type_save {
   animation-name: background-color, transformations;
   animation-duration: 0.5s, 0.7s;
   animation-timing-function: linear, cubic-bezier(0.5, 0, 0.5, 1);
   animation-fill-mode: forwards;
+}
+
+.moviesCard__selecter_type_delete {
+  background-color: #313131;
 }
 
 .moviesCard__selecter-logo {
