@@ -5,14 +5,14 @@ import Footer from "../Footer/Footer";
 import Preloader from "../Preloader/Preloader";
 
 function SavedMovies(props) {
-  const { loggedIn, handlePreloader, isPreloader } = props;
+  const { loggedIn, handlePreloader, isPreloader, cards } = props;
 
   return (
     <>
       <Header loggedIn={loggedIn} />
       {isPreloader ? <Preloader handlePreloader={handlePreloader} /> : ""}
       <SearchForm handlePreloader={handlePreloader} />
-      <MoviesCardList />
+      <MoviesCardList cards={cards} />
       <Footer />
     </>
   );

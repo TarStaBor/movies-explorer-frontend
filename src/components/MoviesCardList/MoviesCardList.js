@@ -1,19 +1,23 @@
 import "./MoviesCardList.css";
 import MoviesCard from "../MoviesCard/MoviesCard";
 
-function MoviesCardList() {
+function MoviesCardList(props) {
+  const { cards } = props;
   return (
     <section className="moviesCardList">
-      <div className="moviesCardList__container">
-        <MoviesCard />
-        <MoviesCard />
-        <MoviesCard />
-        <MoviesCard />
-        <MoviesCard />
-        <MoviesCard />
-        <MoviesCard />
-        <MoviesCard />
-      </div>
+      <ul className="moviesCardList__container">
+        {cards.map((card) => {
+          return (
+            <MoviesCard
+              key={card._id}
+              card={card}
+              // onCardClick={onCardClick}
+              // onCardLike={onCardLike}
+              // onCardDelete={onCardDelete}
+            />
+          );
+        })}
+      </ul>
     </section>
   );
 }

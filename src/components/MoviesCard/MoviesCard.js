@@ -2,9 +2,21 @@ import { useState } from "react";
 import "./MoviesCard.css";
 import active from "../../images/selecter_active.svg";
 import disactive from "../../images/selecter_disactive.svg";
-import picture from "../../images/picture.jpg";
 
-function MoviesCard() {
+function MoviesCard(props) {
+  const { card } = props;
+  const imgUrl = "https://api.nomoreparties.co" + card.image.url;
+
+  function prepareDuration(minutes) {
+    if (minutes > 60) {
+      return ((minutes / 60) | 0) + "ч " + (minutes % 60) + "м";
+    } else if ((minutes = 60)) {
+      return ((minutes / 60) | 0) + "ч ";
+    }
+    return minutes + " мин";
+  }
+  const duration = prepareDuration(card.duration);
+
   const [selectActive, setSelectActive] = useState(false);
 
   function saveMovie() {
@@ -12,11 +24,11 @@ function MoviesCard() {
   }
 
   return (
-    <section className="moviesCard">
+    <li className="moviesCard">
       <div className="moviesCard__header">
         <div className="moviesCard__info">
-          <h2 className="moviesCard__title">33 слова о дизайне</h2>
-          <h3 className="moviesCard__subtitle">1ч 47м</h3>
+          <h2 className="moviesCard__title">{card.nameRU}</h2>
+          <h3 className="moviesCard__subtitle">{duration}</h3>
         </div>
         <div
           className={`moviesCard__selecter ${selectActive ? "moviesCard__selecter_save" : ""} link-opacity`}
@@ -29,8 +41,8 @@ function MoviesCard() {
           ></img>
         </div>
       </div>
-      <img src={picture} className="moviesCard__picture" alt="Изображение фильма"></img>
-    </section>
+      <img src={imgUrl} className="moviesCard__picture" alt="Изображение фильма"></img>
+    </li>
   );
 }
 
