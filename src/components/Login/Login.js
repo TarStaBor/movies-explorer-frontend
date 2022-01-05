@@ -1,13 +1,22 @@
 import { Link } from "react-router-dom";
 import "./Login.css";
 import logo from "../../images/logo.svg";
+import { Validation } from "../../utils/Validation";
+import Preloader from "../Preloader/Preloader";
 
 function Login(props) {
-  const { handleloggedInClick } = props;
+  const { errorMesage, handleSubmit, isPreloader } = props;
+  const { values, handleChange, errors, isValid } = Validation();
+
+  function Submite(evt) {
+    evt.preventDefault();
+    handleSubmit(values["email"], values["password"]);
+  }
 
   return (
     <section className="login">
-      <form className="login__form">
+      {isPreloader && <Preloader />}
+      <form className="login__form" onSubmit={Submite}>
         <div className="login__header">
           <Link className="login__link" to="/">
             <img src={logo} className="login__logo link-opacity" alt="Логотип"></img>
@@ -16,18 +25,43 @@ function Login(props) {
         </div>
         <div className="login__container">
           <p className="login__text">E-mail</p>
-          <input className="login__input" type="email" required value="pochta@yandex.ru" />
-          <p className="login__error-text" style={{ visibility: "hidden" }}>
-            Что-то пошло не так...
+
+          <input
+            className={`login__input ${errors.email !== "" && `login__input_type_error`}`}
+            type="email"
+            name="email"
+            onChange={handleChange}
+            minLength="2"
+            maxLength="30"
+            pattern="^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$"
+            required
+            autoComplete="off"
+          />
+
+          <p className={`login__error-text ${errors.email === "" && `login__error-text_type_disabled`}`}>
+            {errors["email"] ? errors["email"] : "⁣"}
           </p>
+
           <p className="login__text">Пароль</p>
-          <input className="login__input" required type="password" />
-          <p className="login__error-text" style={{ visibility: "hidden" }}>
-            Что-то пошло не так...
+          <input
+            className={`login__input ${errors.password !== "" && `login__input_type_error`}`}
+            type="password"
+            name="password"
+            onChange={handleChange}
+            minLength="8"
+            maxLength="30"
+            required
+          />
+          <p className={`login__error-text ${errors.password === "" && `login__error-text_type_disabled`}`}>
+            {errors["password"] ? errors["password"] : "⁣"}
           </p>
         </div>
         <div className="login__submit">
-          <button type="submit" className="login__submit-button link-opacity" onClick={handleloggedInClick}>
+          {errorMesage && <p className="login__submitError">{errorMesage}</p>}
+          <button
+            type="submit"
+            className={`login__submit-button ${!isValid ? "login__submit-button_type_disable" : "link-opacity"}`}
+          >
             Войти
           </button>
           <h2 className="login__reg-question">

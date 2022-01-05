@@ -1,30 +1,98 @@
+import React from "react";
+import { CurrentUserContext } from "../../contexts/Context";
 import "./Profile.css";
 import Header from "../Header/Header";
+import { Validation } from "../../utils/Validation";
+import Preloader from "../Preloader/Preloader";
 
 function Profile(props) {
-  const { loggedIn, handleloggedInClick } = props;
+  const { setEdit, edit, errorMesage, handleUpdateUser, loggedIn, handleloggedOutClick, isPreloader } = props;
+
+  const currentUser = React.useContext(CurrentUserContext);
+
+  const { values, handleChange, errors, isValid } = Validation();
+
+  function handleEdit(e) {
+    e.preventDefault(); //проверить
+    setEdit(true);
+  }
+
+  function handleSubmit(evt) {
+    evt.preventDefault();
+
+    handleUpdateUser(
+      values["name"] ? values["name"] : currentUser.name,
+      values["email"] ? values["email"] : currentUser.email
+    );
+  }
 
   return (
     <>
       <Header loggedIn={loggedIn} />
       <section className="profile">
+        {isPreloader && <Preloader />}
         <form className="profile__form">
-          <h2 className="profile__title">Привет, Виталий!</h2>
+          <h2 className="profile__title">Привет, {currentUser.name}!</h2>
           <div className="profile__container">
+            <p className={`profile__error-text ${errors.name === "" && `profile__error-text_type_disabled`}`}>
+              {errors["name"] ? errors["name"] : "⁣"}
+            </p>
             <div className="profile__form-element">
               <p className="profile__text">Имя</p>
-              <input className="profile__input" type="text" value="Виталий" />
+              <input
+                className={`profile__input ${errors.name && `profile__input_type_error`}`}
+                type="name"
+                name="name"
+                onChange={handleChange}
+                minLength="2"
+                maxLength="30"
+                pattern="^[A-Za-zА-Яа-я\s]{1,}$"
+                required
+                autoComplete="off"
+                defaultValue={currentUser.name}
+                disabled={!edit && "disabled"}
+              />
             </div>
             <div className="profile__form-element">
               <p className="profile__text">E&#8209;mail</p>
-              <input className="profile__input" type="email" value="pochta@yandex.ru" />
+
+              <input
+                className={`profile__input ${errors.email && `profile__input_type_error`}`}
+                type="email"
+                name="email"
+                onChange={handleChange}
+                minLength="2"
+                maxLength="30"
+                pattern="^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$"
+                required
+                defaultValue={currentUser.email}
+                disabled={!edit && "disabled"}
+              />
             </div>
+            <p className={`profile__error-text ${errors.email === "" && `profile__error-text_type_disabled`}`}>
+              {errors["email"] ? errors["email"] : "⁣"}
+            </p>
           </div>
           <div className="profile__exit">
-            <button type="submit" className="profile__button link-opacity">
-              Редактировать
-            </button>
-            <button className="profile__exit-button link-opacity" onClick={handleloggedInClick}>
+            {!edit ? (
+              <button className="profile__button link-opacity" onClick={handleEdit}>
+                Редактировать
+              </button>
+            ) : (
+              <div className="profile__saveContainer">
+                {errorMesage && <p className="profile__submitError">{errorMesage}</p>}
+                <button
+                  type="submit"
+                  className={`profile__submit-button ${
+                    !isValid ? "profile__submit-button_type_disable" : "link-opacity"
+                  }`}
+                  onClick={handleSubmit}
+                >
+                  Сохранить
+                </button>
+              </div>
+            )}
+            <button className="profile__exit-button link-opacity" onClick={handleloggedOutClick} type="submite">
               Выйти из аккаунта
             </button>
           </div>

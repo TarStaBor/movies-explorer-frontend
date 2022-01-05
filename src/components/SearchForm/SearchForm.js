@@ -1,28 +1,39 @@
 import "./SearchForm.css";
 import magnifier from "../../images/magnifier.svg";
-
-import findArrow from "../../images/find-arrow.svg";
 import FilterCheckbox from "../FilterCheckbox/FilterCheckbox";
 
 function SearchForm(props) {
-  const { handlePreloader } = props;
+  const { handleFilter, setSearchValue, tumbler, setTumbler, arrayforSearch, searchValue } = props;
+
+  function handleEdit(evt) {
+    setSearchValue(evt.target.value);
+  }
 
   return (
     <section className="searchForm">
       <div className="searchForm__box">
         <div className="searchForm__search-bar">
-          <div className="searchForm__search-side">
+          <form
+            className="searchForm__search-side"
+            onSubmit={(evt) => {
+              evt.preventDefault();
+              handleFilter(arrayforSearch);
+            }}
+          >
             <img src={magnifier} className="searchForm__magnifier" alt="Изображение лупы"></img>
-            <input className="searchForm__search-input" required placeholder="Фильм"></input>
-            <img
-              src={findArrow}
-              className="searchForm__findArrow link-opacity"
-              onClick={handlePreloader}
-              alt="Кнопка поиска"
-            ></img>
-          </div>
+            <input
+              className="searchForm__search-input"
+              type="text"
+              name="searchValue"
+              value={searchValue}
+              required
+              placeholder="Фильм"
+              onChange={handleEdit}
+            ></input>
+            <button className="searchForm__findArrow link-opacity" type="submit"></button>
+          </form>
           <div className="searchForm__format-side">
-            <FilterCheckbox />
+            <FilterCheckbox tumbler={tumbler} setTumbler={setTumbler} />
             <h2 className="searchForm__format-title">Короткометражки</h2>
           </div>
         </div>

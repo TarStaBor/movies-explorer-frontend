@@ -1,10 +1,9 @@
 import React from "react";
 import "./Preloader.css";
 
-const Preloader = (props) => {
-  const { handlePreloader } = props;
+const Preloader = () => {
   return (
-    <div className="preloader" onClick={handlePreloader}>
+    <div className="preloader">
       <div className="preloader__container">
         <span className="preloader__round"></span>
       </div>

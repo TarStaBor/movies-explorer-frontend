@@ -1,122 +1,167 @@
-export class MainApi {
-  constructor(options) {
-    this._url = options.url;
-    this._headers = options.headers;
+export const BASE_URL = "https://api.film-explorer.nomoredomains.rocks";
+export const BEATFILM_URL = "https://api.nomoreparties.co";
+
+// метод обработки ответа сервера
+async function getResponseData(result) {
+  const res = await result.json();
+  if (result.ok) {
+    return res;
+  } else {
+    return Promise.reject(res);
   }
-  // метод обработки ответа сервера
-  _getResponseData(res) {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  }
-
-  getListCard() {
-    return fetch(this._url, {
-      method: "GET",
-      //   headers: {
-      //     authorization: `Bearer ${localStorage.getItem('token')}`,
-      //     'Content-Type': 'application/json'
-      //   }
-    }).then((response) => {
-      return this._getResponseData(response);
-    });
-  }
-
-  // получить список всех карточек в виде массива (GET)
-  // getListCard() {
-  //   return fetch(this._url + "/cards", {
-  //     method: "GET",
-  //     headers: {
-  //       authorization: `Bearer ${localStorage.getItem('token')}`,
-  //       'Content-Type': 'application/json'
-  //     }
-  //   }).then((response) => {
-  //     return this._getResponseData(response);
-  //   });
-  // }
-
-  //   // добавить карточку (POST)
-  //   postCard(text) {
-  //     return fetch(this._url + "/cards", {
-  //       method: "POST",
-  //       headers: {
-  //         authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(text),
-  //     }).then((response) => {
-  //       return this._getResponseData(response);
-  //     });
-  //   }
-  //   // удалить карточку (DELETE)
-  //   deleteCard(id) {
-  //     return fetch(this._url + "/cards/" + id, {
-  //       method: "DELETE",
-  //       headers: {
-  //         authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         "Content-Type": "application/json",
-  //       },
-  //     }).then((response) => {
-  //       return this._getResponseData(response);
-  //     });
-  //   }
-  //   // получить данные пользователя (GET)
-  //   getUserInfo() {
-  //     return fetch(this._url + "/users/me", {
-  //       method: "GET",
-  //       headers: {
-  //         authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         "Content-Type": "application/json",
-  //       },
-  //     }).then((response) => {
-  //       return this._getResponseData(response);
-  //     });
-  //   }
-
-  //   // заменить данные пользователя (PATCH)
-  //   patchUserInfo(text) {
-  //     return fetch(this._url + "/users/me", {
-  //       method: "PATCH",
-  //       headers: {
-  //         authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(text),
-  //     }).then((response) => {
-  //       return this._getResponseData(response);
-  //     });
-  //   }
-  //   // заменить аватар (PATCH)
-  //   patchAvatar(url) {
-  //     return fetch(this._url + "/users/me/avatar", {
-  //       method: "PATCH",
-  //       headers: {
-  //         authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(url),
-  //     }).then((response) => {
-  //       return this._getResponseData(response);
-  //     });
-  //   }
-
-  //   // “изменить” статус лайка (PUT/DELETE)
-  //   changeLikeCardStatus(id, isLiked) {
-  //     return fetch(this._url + `/cards/${id}/likes`, {
-  //       method: isLiked ? "PUT" : "DELETE",
-  //       headers: {
-  //         authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         "Content-Type": "application/json",
-  //       },
-  //     }).then((response) => {
-  //       return this._getResponseData(response);
-  //     });
-  //   }
 }
 
-const api = new MainApi({
-  url: "https://api.film-explorer.nomoredomains.rocks/",
-});
+//Регистрация
 
-export default api;
+export const register = (name, email, password) => {
+  return fetch(`${BASE_URL}/signup`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name,
+      email,
+      password,
+    }),
+  })
+    .then((response) => {
+      return getResponseData(response);
+    })
+    .then((data) => {
+      return data;
+    });
+};
+
+//Авторизация
+
+export const authorize = (email, password) => {
+  return fetch(`${BASE_URL}/signin`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email,
+      password,
+    }),
+  })
+    .then((response) => {
+      return getResponseData(response);
+    })
+    .then((data) => {
+      return data;
+    });
+};
+
+//Получить данные пользователя
+
+export const getUserInfo = (token) => {
+  return fetch(`${BASE_URL}/users/me`, {
+    method: "GET",
+    headers: {
+      authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      return getResponseData(response);
+    })
+    .then((res) => {
+      if (res) {
+        return res;
+      }
+    });
+};
+
+// изменить данные пользователя (PATCH)
+export const patchUserInfo = (name, email) => {
+  return fetch(`${BASE_URL}/users/me`, {
+    method: "PATCH",
+    headers: {
+      authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name,
+      email,
+    }),
+  })
+    .then((response) => {
+      return getResponseData(response);
+    })
+    .then((res) => {
+      if (res) {
+        return res;
+      }
+    });
+};
+
+// Добавить фильм в избранные
+
+export const saveFilm = (card) => {
+  return fetch(`${BASE_URL}/movies`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      country: card.country,
+      director: card.director,
+      duration: card.duration,
+      year: card.year,
+      description: card.description,
+      image: `${BEATFILM_URL + card.image.url}`,
+      trailer: card.trailerLink,
+      thumbnail: card.trailerLink,
+      movieId: card.id,
+      nameRU: card.nameRU,
+      nameEN: card.nameEN,
+    }),
+  })
+    .then((response) => {
+      return getResponseData(response);
+    })
+    .then((data) => {
+      return data;
+    });
+};
+
+// Получить избранные фильмы
+
+export const getFilms = () => {
+  return fetch(`${BASE_URL}/movies`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      return getResponseData(response);
+    })
+    .then((data) => {
+      return data;
+    });
+};
+
+// Удалить фильм из избранного
+
+export const deleteFilm = (card) => {
+  return fetch(`${BASE_URL}/movies/${card._id}`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: {
+      authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      return getResponseData(response);
+    })
+    .then((data) => {
+      return data;
+    });
+};

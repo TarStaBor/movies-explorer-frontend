@@ -1,29 +1,35 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./MoviesCard.css";
 import active from "../../images/selecter_active.svg";
 import disactive from "../../images/selecter_disactive.svg";
 import crossDelete from "../../images/selecter_delete.svg";
 
 function MoviesCard(props) {
-  const { card } = props;
-  const imgUrl = "https://api.nomoreparties.co" + card.image.url;
+  const { card, handleSaveFilm, handleDeleteFilm, saveCards } = props;
+  const duration = prepareDuration(card.duration);
+  const pathName = window.location.pathname;
+  const imgUrl = pathName === "/movies" ? "https://api.nomoreparties.co" + card.image.url : card.image;
 
+  //Стейт лайка карточки
+  const [isLike, setIsLike] = useState(false);
+
+  useEffect(() => {
+    saveCards.map((saveCard) => {
+      if (saveCard.movieId === card.id) {
+        setIsLike(true);
+      }
+    });
+  }, [saveCards]);
+
+  // function setAllCards
   function prepareDuration(minutes) {
     if (minutes > 60) {
       return ((minutes / 60) | 0) + "ч " + (minutes % 60) + "м";
-    } else if ((minutes = 60)) {
+    } else if (minutes === 60) {
       return ((minutes / 60) | 0) + "ч ";
+    } else {
+      return minutes + " мин";
     }
-    return minutes + " мин";
-  }
-  const duration = prepareDuration(card.duration);
-
-  const [selectActive, setSelectActive] = useState(false);
-
-  const pathName = window.location.pathname;
-
-  function saveMovie() {
-    if (selectActive === true ? setSelectActive(false) : setSelectActive(true));
   }
 
   return (
@@ -35,16 +41,28 @@ function MoviesCard(props) {
         </div>
 
         {pathName === "/saved-movies" ? (
-          <button className="moviesCard__selecter moviesCard__selecter_type_delete link-opacity">
+          <button
+            className="moviesCard__selecter moviesCard__selecter_type_delete link-opacity"
+            onClick={() => {
+              handleDeleteFilm(card);
+            }}
+          >
             <img src={crossDelete} className="moviesCard__selecter-logo" alt="Логотип удаления из изюранного"></img>
           </button>
         ) : (
           <button
-            className={`moviesCard__selecter ${selectActive ? "moviesCard__selecter_type_save" : ""} link-opacity`}
-            onClick={saveMovie}
+            className={`moviesCard__selecter ${isLike ? "moviesCard__selecter_type_save" : ""} link-opacity`}
+            onClick={() => {
+              if (isLike) {
+                handleDeleteFilm(saveCards.find((saveCard) => saveCard.movieId === card.id));
+              } else {
+                handleSaveFilm(card);
+              }
+              setIsLike(!isLike);
+            }}
           >
             <img
-              src={selectActive ? active : disactive}
+              src={isLike ? active : disactive}
               className="moviesCard__selecter-logo"
               alt="Логотип добавления в избранные"
             ></img>

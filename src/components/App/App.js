@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
-import api from "../../utils/MoviesApi";
+import { CurrentUserContext } from "../../contexts/Context";
 import { Routes, Route } from "react-router-dom";
 import { useNavigate } from "react-router";
+import { ProtectedRoute } from "../HOC/ProtectedRoute";
+import * as MainApi from "../../utils/MainApi";
+import api from "../../utils/MoviesApi";
 import "./App.css";
 import Main from "../Main/Main";
 import Movies from "../Movies/Movies";
@@ -13,31 +16,95 @@ import Error from "../Error/Error";
 
 function App() {
   const navigate = useNavigate();
-  const [loggedIn, setLoggedIn] = useState(true);
-  const [preloader, setpreloader] = useState(false);
+
+  // Стейт  регистрации
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  // Стейт актуального пользователя
+  const [currentUser, setCurrentUser] = useState({});
+
+  // Стейт карточек из BeatFilm
   const [cards, setCards] = useState([]);
 
-  function handleloggedInClick(e) {
-    e.preventDefault();
-    if (loggedIn === true ? setLoggedIn(false) : setLoggedIn(true));
+  // Стейт карточек из нашего API
+  const [saveCards, setSaveCards] = useState([]);
 
-    navigate("/", { replace: false });
-  }
+  // Стейт отфильтрованных карточек
+  const [filterCards, setFilterCards] = useState([]);
 
-  function handlePreloader(e) {
-    if (preloader === true ? setpreloader(false) : setpreloader(true));
-  }
+  // Стейт избранных отфильтрованных карточек
+  const [filterSavedCards, setFilterSavedCards] = useState([]);
 
-  // Получаем набор карточек и информацию о пользователе
+  // Стейт прелодера
+  const [preloader, setPreloader] = useState(false);
+
+  // Стейт сообщения с ошибкой при обращении к MainApi
+  const [errorMesage, setErrorMesage] = useState("");
+
+  // Стейт просмотра/редактирования профиля
+  const [edit, setEdit] = useState(false);
+
+  // Стейт количества карточек для показа
+  const [amountShowCards, setAmountShowCards] = useState(
+    window.innerWidth > 1279 ? 12 : window.innerWidth > 767 ? 8 : 5
+  );
+
+  // Стейт количества карточек для добавления
+  const [addShowCards, setAddShowCards] = useState(window.innerWidth > 1279 ? 3 : 2);
+
+  // Стейт содержимого инпута в Movies
+  const [moviesInputValue, setMoviesInputValue] = useState("");
+
+  // Стейт содержимого инпута в SavedMovies
+  const [savedMoviesInputValue, setSavedMoviesInputValue] = useState("");
+
+  // Стейт состояния тумблера в Movies
+  const [moviesTumbler, setMoviesTumbler] = useState(false);
+
+  // Стейт состояния тумблера в SavedMovies
+  const [savedMoviesTumbler, setSavedMoviesTumbler] = useState(false);
+
+  // Эффекты при монтировании App.js
+  useEffect(() => {
+    //обновить отфильтрованные карточки из локального хранилища
+    setFilterCards(JSON.parse(localStorage.getItem("filterCards")));
+
+    //обновить избранные отфильтрованные карточки из локального хранилища
+    setFilterSavedCards(JSON.parse(localStorage.getItem("filterSavedCards")));
+
+    //обновить положение чекбокса из локального хранилища для Movies
+    setMoviesTumbler(JSON.parse(localStorage.getItem("moviesTumbler")));
+
+    //обновить положение чекбокса из локального хранилища для SavedMovies
+    setSavedMoviesTumbler(JSON.parse(localStorage.getItem("savedMoviesTumbler")));
+
+    //обновить содержимое инпута для Movies
+    setMoviesInputValue(JSON.parse(localStorage.getItem("moviesInputValue")));
+
+    //обновить содержимое инпута для Saved-Movies
+    setSavedMoviesInputValue(JSON.parse(localStorage.getItem("savedMoviesInputValue")));
+  }, []);
+
+  // Эффект проверки авторизации на сайте
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      MainApi.getUserInfo(localStorage.token)
+        .then(() => {
+          setLoggedIn(true);
+        })
+        .catch((err) => {
+          setLoggedIn(false);
+          console.log(err);
+        });
+    }
+  }, []);
+
+  // Эффект получения информации о пользователе
   useEffect(() => {
     if (loggedIn === true) {
-      // Promise.all([api.getListCard(), api.getUserInfo()])
-      api
-        .getListCard()
-        .then((cards) => {
-          // .then(([cards, userData]) => {
-          setCards(cards);
-          // setCurrentUser(userData.user);
+      MainApi.getUserInfo()
+        .then((userData) => {
+          setCurrentUser(userData);
         })
         .catch((err) => {
           console.log(err);
@@ -45,28 +112,244 @@ function App() {
     }
   }, [loggedIn]);
 
+  // Эффект получения избранных фильмов
+  useEffect(() => {
+    MainApi.getFilms()
+      .then((cards) => {
+        setSaveCards(cards);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  // Эффект запроса карточек от BeatFilms
+  useEffect(() => {
+    api
+      .getListCard()
+      .then((cards) => {
+        setCards(cards);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  // Функция очистки localStirage при выходе
+  function handleloggedOutClick(e) {
+    e.preventDefault();
+    localStorage.removeItem("filterCards");
+    localStorage.removeItem("filterSavedCards");
+    localStorage.removeItem("moviesTumbler");
+    localStorage.removeItem("savedMoviesTumbler");
+    localStorage.removeItem("moviesInputValue");
+    localStorage.removeItem("savedMoviesInputValue");
+    localStorage.removeItem("token");
+    setLoggedIn(false);
+    navigate("/", { replace: false });
+  }
+
+  // Функция добавления в избранные
+  function handleSaveFilm(card) {
+    setPreloader(true);
+    MainApi.saveFilm(card)
+      .then((res) => {
+        setSaveCards([...saveCards, res]);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setPreloader(false);
+      });
+  }
+
+  // Функция удаления из избранного
+  function handleDeleteFilm(card) {
+    setPreloader(true);
+    MainApi.deleteFilm(card)
+      .then(() => {
+        setSaveCards(saveCards.filter((m) => m._id !== card._id));
+        setFilterSavedCards(saveCards.filter((m) => m._id !== card._id));
+        localStorage.setItem("filterSavedCards", JSON.stringify(saveCards.filter((m) => m._id !== card._id)));
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setPreloader(false);
+      });
+  }
+
+  // Функция запроса к АПИ на регистрацию
+  function registration(name, email, password) {
+    setPreloader(true);
+    MainApi.register(name, email, password)
+      .then(() => {
+        navigate("/signin", { replace: false });
+      })
+      .catch((err) => {
+        setErrorMesage(err.message);
+      })
+      .finally(() => {
+        setPreloader(false);
+      });
+  }
+
+  // Функция запроса к АПИ на авторизацию
+  function authorization(email, password) {
+    setPreloader(true);
+    MainApi.authorize(email, password)
+      .then((data) => {
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+          setLoggedIn(true);
+          navigate("/movies", { replace: false });
+        }
+      })
+      .catch((err) => {
+        setErrorMesage(err.message);
+      })
+      .finally(() => {
+        setPreloader(false);
+      });
+  }
+
+  // Функция изменения профайла
+  function handleUpdateUser(name, email) {
+    setPreloader(true);
+    MainApi.patchUserInfo(name, email)
+      .then((response) => {
+        setCurrentUser(response);
+        setErrorMesage("");
+        setEdit(false);
+      })
+      .catch((err) => {
+        setErrorMesage(err.message);
+        setEdit(true);
+      })
+      .finally(() => {
+        setPreloader(false);
+      });
+  }
+
+  // Функция фильтрации карточек в Movies по ключевому слову
+  function handleMoviesFilter(arrayforSearch) {
+    // eslint-disable-next-line array-callback-return
+    const newArray = arrayforSearch.filter((card) => {
+      if (card.nameRU.toLowerCase().includes(moviesInputValue)) {
+        return card;
+      }
+    });
+    localStorage.setItem("filterCards", JSON.stringify(newArray));
+    setFilterCards(JSON.parse(localStorage.getItem("filterCards")));
+    localStorage.setItem("moviesInputValue", JSON.stringify(moviesInputValue));
+    localStorage.setItem("moviesTumbler", JSON.stringify(moviesTumbler));
+  }
+
+  // Функция фильтрации карточек в SavedMovies по ключевому слову
+  function handleSavedMoviesFilter(arrayforSearch) {
+    // eslint-disable-next-line array-callback-return
+    const newArray = arrayforSearch.filter((card) => {
+      if (card.nameRU.toLowerCase().includes(savedMoviesInputValue)) {
+        return card;
+      }
+    });
+    localStorage.setItem("filterSavedCards", JSON.stringify(newArray));
+    setFilterSavedCards(JSON.parse(localStorage.getItem("filterSavedCards")));
+    localStorage.setItem("savedMoviesInputValue", JSON.stringify(savedMoviesInputValue));
+    localStorage.setItem("savedMoviesTumbler", JSON.stringify(savedMoviesTumbler));
+  }
+
+  // Автоматическое определение размера экрана
+  window.onresize = () => {
+    if (window.innerWidth > 1279) {
+      setAddShowCards(3);
+    } else {
+      setAddShowCards(2);
+    }
+  };
+
   return (
-    <section className="root">
-      <Routes>
-        <Route path="/" element={<Main loggedIn={loggedIn} />} />
-        <Route
-          path="/movies"
-          element={
-            <Movies loggedIn={loggedIn} handlePreloader={handlePreloader} isPreloader={preloader} cards={cards} />
-          }
-        />
-        <Route
-          path="/saved-movies"
-          element={
-            <SavedMovies loggedIn={loggedIn} handlePreloader={handlePreloader} isPreloader={preloader} cards={cards} />
-          }
-        />
-        <Route path="/profile" element={<Profile loggedIn={loggedIn} handleloggedInClick={handleloggedInClick} />} />
-        <Route path="/signin" element={<Login handleloggedInClick={handleloggedInClick} />} />
-        <Route path="/signup" element={<Register />} />
-        <Route path="*" element={<Error />} />
-      </Routes>
-    </section>
+    <CurrentUserContext.Provider value={currentUser}>
+      <section className="root">
+        <Routes>
+          <Route path="/" element={<Main loggedIn={loggedIn} />} />
+          <Route
+            path="/movies"
+            element={
+              <ProtectedRoute loggedIn={loggedIn}>
+                <Movies
+                  tumbler={moviesTumbler}
+                  setTumbler={setMoviesTumbler}
+                  filterCards={filterCards}
+                  handleFilter={handleMoviesFilter}
+                  setMoviesInputValue={setMoviesInputValue}
+                  amountShowCards={amountShowCards}
+                  setAmountShowCards={setAmountShowCards}
+                  addShowCards={addShowCards}
+                  handleDeleteFilm={handleDeleteFilm}
+                  handleSaveFilm={handleSaveFilm}
+                  saveCards={saveCards}
+                  loggedIn={loggedIn}
+                  isPreloader={preloader}
+                  cards={cards}
+                  searchValue={moviesInputValue}
+                />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/saved-movies"
+            element={
+              <ProtectedRoute loggedIn={loggedIn}>
+                <SavedMovies
+                  filterSavedCards={filterSavedCards}
+                  tumbler={savedMoviesTumbler}
+                  setTumbler={setSavedMoviesTumbler}
+                  handleFilter={handleSavedMoviesFilter}
+                  setSavedMoviesInputValue={setSavedMoviesInputValue}
+                  amountShowCards={amountShowCards}
+                  setAmountShowCards={setAmountShowCards}
+                  addShowCards={addShowCards}
+                  handleDeleteFilm={handleDeleteFilm}
+                  handleSaveFilm={handleSaveFilm}
+                  saveCards={saveCards}
+                  loggedIn={loggedIn}
+                  isPreloader={preloader}
+                  searchValue={savedMoviesInputValue}
+                />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute loggedIn={loggedIn}>
+                <Profile
+                  setEdit={setEdit}
+                  edit={edit}
+                  errorMesage={errorMesage}
+                  handleUpdateUser={handleUpdateUser}
+                  loggedIn={loggedIn}
+                  handleloggedOutClick={handleloggedOutClick}
+                  isPreloader={preloader}
+                />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/signin"
+            element={<Login errorMesage={errorMesage} handleSubmit={authorization} isPreloader={preloader} />}
+          />
+          <Route
+            path="/signup"
+            element={<Register errorMesage={errorMesage} handleSubmit={registration} isPreloader={preloader} />}
+          />
+          <Route path="*" element={<Error />} />
+        </Routes>
+      </section>
+    </CurrentUserContext.Provider>
   );
 }
 

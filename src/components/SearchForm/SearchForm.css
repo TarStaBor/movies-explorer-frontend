@@ -39,7 +39,7 @@
 }
 
 .searchForm__magnifier {
-  width: 15px;
+  max-width: 15px;
   height: 15px;
   transform: rotate(-45deg);
 }
@@ -62,9 +62,16 @@
 }
 
 .searchForm__findArrow {
+  background-image: url("../../images/find-arrow.svg");
+  background-repeat: no-repeat;
+  background-position: center;
   margin-right: 30px;
-  width: 34px;
+  min-width: 34px;
   height: 34px;
+  border: none;
+  border-radius: 50%;
+  background-color: transparent;
+  outline: none;
 }
 
 .searchForm__format-side {
