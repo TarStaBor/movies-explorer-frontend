@@ -51,7 +51,7 @@ function MoviesCard(props) {
           </button>
         ) : (
           <button
-            className={`moviesCard__selecter ${isLike ? "moviesCard__selecter_type_save" : ""} link-opacity`}
+            className={`moviesCard__selecter ${isLike === true && "moviesCard__selecter_type_save"} link-opacity`}
             onClick={() => {
               if (isLike) {
                 handleDeleteFilm(saveCards.find((saveCard) => saveCard.movieId === card.id));

@@ -5,7 +5,7 @@ import { Validation } from "../../utils/Validation";
 import Preloader from "../Preloader/Preloader";
 
 function Register(props) {
-  const { errorMesage, handleSubmit, isPreloader } = props;
+  const { errorMesage, handleSubmit, isPreloader, blockInput } = props;
   const { values, handleChange, errors, isValid } = Validation();
   function Submite(evt) {
     evt.preventDefault();
@@ -34,6 +34,7 @@ function Register(props) {
             pattern="^[A-Za-zА-Яа-я\s]{1,}$"
             required
             autoComplete="off"
+            disabled={blockInput && "disabled"}
           />
           <p className={`register__error-text ${errors.name === "" && `register__error-text_type_disabled`}`}>
             {errors["name"] ? errors["name"] : "⁣"}
@@ -46,8 +47,9 @@ function Register(props) {
             onChange={handleChange}
             minLength="2"
             maxLength="30"
-            pattern="^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$"
+            pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}$"
             required
+            disabled={blockInput && "disabled"}
           />
           <p className={`register__error-text ${errors.email === "" && `register__error-text_type_disabled`}`}>
             {errors["email"] ? errors["email"] : "⁣"}
@@ -61,6 +63,7 @@ function Register(props) {
             minLength="8"
             maxLength="30"
             required
+            disabled={blockInput && "disabled"}
           />
           <p className={`register__error-text ${errors.password === "" && `register__error-text_type_disabled`}`}>
             {errors["password"] ? errors["password"] : "⁣"}

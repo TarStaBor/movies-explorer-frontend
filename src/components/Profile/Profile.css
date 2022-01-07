@@ -98,6 +98,17 @@
   flex-direction: column;
 }
 
+.profile__successMessage {
+  margin: 0 auto 30px;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 16px;
+  background-color: #202020;
+  color: #228cbb;
+  border: none;
+}
+
 .profile__button {
   font-style: normal;
   font-weight: normal;

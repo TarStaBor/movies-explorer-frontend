@@ -5,7 +5,7 @@ import { Validation } from "../../utils/Validation";
 import Preloader from "../Preloader/Preloader";
 
 function Login(props) {
-  const { errorMesage, handleSubmit, isPreloader } = props;
+  const { errorMesage, handleSubmit, isPreloader, blockInput } = props;
   const { values, handleChange, errors, isValid } = Validation();
 
   function Submite(evt) {
@@ -33,9 +33,10 @@ function Login(props) {
             onChange={handleChange}
             minLength="2"
             maxLength="30"
-            pattern="^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$"
+            pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}$"
             required
             autoComplete="off"
+            disabled={blockInput && "disabled"}
           />
 
           <p className={`login__error-text ${errors.email === "" && `login__error-text_type_disabled`}`}>
@@ -51,6 +52,7 @@ function Login(props) {
             minLength="8"
             maxLength="30"
             required
+            disabled={blockInput && "disabled"}
           />
           <p className={`login__error-text ${errors.password === "" && `login__error-text_type_disabled`}`}>
             {errors["password"] ? errors["password"] : "⁣"}

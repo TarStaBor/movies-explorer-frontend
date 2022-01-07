@@ -58,11 +58,17 @@ function App() {
   // Стейт содержимого инпута в SavedMovies
   const [savedMoviesInputValue, setSavedMoviesInputValue] = useState("");
 
+  // Стейт блокировки инпута
+  const [blockInput, setBlockInput] = useState(false);
+
   // Стейт состояния тумблера в Movies
   const [moviesTumbler, setMoviesTumbler] = useState(false);
 
   // Стейт состояния тумблера в SavedMovies
   const [savedMoviesTumbler, setSavedMoviesTumbler] = useState(false);
+
+  // Стейт успешного изменения профиля
+  const [successEditProfile, setSuccessEditProfile] = useState(false);
 
   // Эффекты при монтировании App.js
   useEffect(() => {
@@ -152,6 +158,7 @@ function App() {
   // Функция добавления в избранные
   function handleSaveFilm(card) {
     setPreloader(true);
+    setBlockInput(true);
     MainApi.saveFilm(card)
       .then((res) => {
         setSaveCards([...saveCards, res]);
@@ -161,12 +168,14 @@ function App() {
       })
       .finally(() => {
         setPreloader(false);
+        setBlockInput(false);
       });
   }
 
   // Функция удаления из избранного
   function handleDeleteFilm(card) {
     setPreloader(true);
+    setBlockInput(true);
     MainApi.deleteFilm(card)
       .then(() => {
         setSaveCards(saveCards.filter((m) => m._id !== card._id));
@@ -178,12 +187,14 @@ function App() {
       })
       .finally(() => {
         setPreloader(false);
+        setBlockInput(false);
       });
   }
 
   // Функция запроса к АПИ на регистрацию
   function registration(name, email, password) {
     setPreloader(true);
+    setBlockInput(true);
     MainApi.register(name, email, password)
       .then(() => {
         navigate("/signin", { replace: false });
@@ -193,12 +204,14 @@ function App() {
       })
       .finally(() => {
         setPreloader(false);
+        setBlockInput(false);
       });
   }
 
   // Функция запроса к АПИ на авторизацию
   function authorization(email, password) {
     setPreloader(true);
+    setBlockInput(true);
     MainApi.authorize(email, password)
       .then((data) => {
         if (data.token) {
@@ -212,24 +225,29 @@ function App() {
       })
       .finally(() => {
         setPreloader(false);
+        setBlockInput(false);
       });
   }
 
   // Функция изменения профайла
   function handleUpdateUser(name, email) {
     setPreloader(true);
+    setBlockInput(true);
     MainApi.patchUserInfo(name, email)
       .then((response) => {
         setCurrentUser(response);
         setErrorMesage("");
         setEdit(false);
+        setSuccessEditProfile(true);
       })
       .catch((err) => {
         setErrorMesage(err.message);
         setEdit(true);
+        setSuccessEditProfile(false);
       })
       .finally(() => {
         setPreloader(false);
+        setBlockInput(false);
       });
   }
 
@@ -334,17 +352,34 @@ function App() {
                   loggedIn={loggedIn}
                   handleloggedOutClick={handleloggedOutClick}
                   isPreloader={preloader}
+                  blockInput={blockInput}
+                  successEditProfile={successEditProfile}
+                  setSuccessEditProfile={setSuccessEditProfile}
                 />
               </ProtectedRoute>
             }
           />
           <Route
             path="/signin"
-            element={<Login errorMesage={errorMesage} handleSubmit={authorization} isPreloader={preloader} />}
+            element={
+              <Login
+                errorMesage={errorMesage}
+                handleSubmit={authorization}
+                isPreloader={preloader}
+                blockInput={blockInput}
+              />
+            }
           />
           <Route
             path="/signup"
-            element={<Register errorMesage={errorMesage} handleSubmit={registration} isPreloader={preloader} />}
+            element={
+              <Register
+                errorMesage={errorMesage}
+                handleSubmit={registration}
+                isPreloader={preloader}
+                blockInput={blockInput}
+              />
+            }
           />
           <Route path="*" element={<Error />} />
         </Routes>
