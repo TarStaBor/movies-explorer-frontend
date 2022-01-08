@@ -4,10 +4,10 @@ import "./Navigation.css";
 import profile from "../../images/profile.svg";
 import Burger from "../Burger/Burger";
 import PopupBurger from "../PopupBurger/PopupBurger";
+import { LARGE } from "../../utils/constants";
 
 function Navigation() {
-  const laptop = 1279;
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= laptop);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= LARGE);
   const [isOpen, setIsOpen] = useState(false);
 
   const setActive = ({ isActive }) =>
@@ -18,7 +18,7 @@ function Navigation() {
   }
 
   const updateWidth = useCallback(() => {
-    const newWidth = window.innerWidth <= laptop;
+    const newWidth = window.innerWidth <= LARGE;
     if (newWidth !== isMobile) {
       setIsMobile(newWidth);
     }

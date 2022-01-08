@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { CurrentUserContext } from "../../contexts/Context";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useNavigate } from "react-router";
 import { ProtectedRoute } from "../HOC/ProtectedRoute";
 import * as MainApi from "../../utils/MainApi";
@@ -13,12 +13,21 @@ import Profile from "../Profile/Profile";
 import Login from "../Login/Login";
 import Register from "../Register/Register";
 import Error from "../Error/Error";
+import {
+  LARGE,
+  MEDIUM,
+  AmountShowCardsAtLarge,
+  AmountShowCardsAtMedium,
+  AmountShowCardsAtShort,
+  AddShowCardsAtLarge,
+  AddShowCardsAtMedium,
+} from "../../utils/constants";
 
 function App() {
   const navigate = useNavigate();
 
   // Стейт  регистрации
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(true);
 
   // Стейт актуального пользователя
   const [currentUser, setCurrentUser] = useState({});
@@ -46,11 +55,17 @@ function App() {
 
   // Стейт количества карточек для показа
   const [amountShowCards, setAmountShowCards] = useState(
-    window.innerWidth > 1279 ? 12 : window.innerWidth > 767 ? 8 : 5
+    window.innerWidth > LARGE
+      ? AmountShowCardsAtLarge
+      : window.innerWidth > MEDIUM
+      ? AmountShowCardsAtMedium
+      : AmountShowCardsAtShort
   );
 
   // Стейт количества карточек для добавления
-  const [addShowCards, setAddShowCards] = useState(window.innerWidth > 1279 ? 3 : 2);
+  const [addShowCards, setAddShowCards] = useState(
+    window.innerWidth > LARGE ? AddShowCardsAtLarge : AddShowCardsAtMedium
+  );
 
   // Стейт содержимого инпута в Movies
   const [moviesInputValue, setMoviesInputValue] = useState("");
@@ -70,13 +85,16 @@ function App() {
   // Стейт успешного изменения профиля
   const [successEditProfile, setSuccessEditProfile] = useState(false);
 
+  // Стейт успешного поиска по избранным фильмам
+  const [successSearch, setSuccessSearch] = useState(false);
+
   // Эффекты при монтировании App.js
   useEffect(() => {
     //обновить отфильтрованные карточки из локального хранилища
     setFilterCards(JSON.parse(localStorage.getItem("filterCards")));
 
-    //обновить избранные отфильтрованные карточки из локального хранилища
-    setFilterSavedCards(JSON.parse(localStorage.getItem("filterSavedCards")));
+    // //обновить избранные отфильтрованные карточки из локального хранилища
+    // setFilterSavedCards(JSON.parse(localStorage.getItem("filterSavedCards")));
 
     //обновить положение чекбокса из локального хранилища для Movies
     setMoviesTumbler(JSON.parse(localStorage.getItem("moviesTumbler")));
@@ -86,14 +104,21 @@ function App() {
 
     //обновить содержимое инпута для Movies
     setMoviesInputValue(JSON.parse(localStorage.getItem("moviesInputValue")));
-
-    //обновить содержимое инпута для Saved-Movies
-    setSavedMoviesInputValue(JSON.parse(localStorage.getItem("savedMoviesInputValue")));
   }, []);
+
+  // Эффект проверки что инпут пустой
+  useEffect(() => {
+    savedMoviesInputValue.length === 0 && setSuccessSearch(false);
+  }, [savedMoviesInputValue]);
+
+  // Эффект сохранения положения тумблера
+  useEffect(() => {
+    localStorage.setItem("moviesTumbler", JSON.stringify(moviesTumbler));
+  }, [moviesTumbler]);
 
   // Эффект проверки авторизации на сайте
   useEffect(() => {
-    if (localStorage.getItem("token")) {
+    if (loggedIn) {
       MainApi.getUserInfo(localStorage.token)
         .then(() => {
           setLoggedIn(true);
@@ -103,7 +128,7 @@ function App() {
           console.log(err);
         });
     }
-  }, []);
+  }, [loggedIn]);
 
   // Эффект получения информации о пользователе
   useEffect(() => {
@@ -145,7 +170,6 @@ function App() {
   function handleloggedOutClick(e) {
     e.preventDefault();
     localStorage.removeItem("filterCards");
-    localStorage.removeItem("filterSavedCards");
     localStorage.removeItem("moviesTumbler");
     localStorage.removeItem("savedMoviesTumbler");
     localStorage.removeItem("moviesInputValue");
@@ -180,7 +204,6 @@ function App() {
       .then(() => {
         setSaveCards(saveCards.filter((m) => m._id !== card._id));
         setFilterSavedCards(saveCards.filter((m) => m._id !== card._id));
-        localStorage.setItem("filterSavedCards", JSON.stringify(saveCards.filter((m) => m._id !== card._id)));
       })
       .catch((err) => {
         console.log(err);
@@ -196,8 +219,11 @@ function App() {
     setPreloader(true);
     setBlockInput(true);
     MainApi.register(name, email, password)
-      .then(() => {
-        navigate("/signin", { replace: false });
+      .then((res) => {
+        if (email === res.email) {
+          authorization(email, password);
+          navigate("/movies", { replace: false });
+        }
       })
       .catch((err) => {
         setErrorMesage(err.message);
@@ -273,18 +299,16 @@ function App() {
         return card;
       }
     });
-    localStorage.setItem("filterSavedCards", JSON.stringify(newArray));
-    setFilterSavedCards(JSON.parse(localStorage.getItem("filterSavedCards")));
-    localStorage.setItem("savedMoviesInputValue", JSON.stringify(savedMoviesInputValue));
-    localStorage.setItem("savedMoviesTumbler", JSON.stringify(savedMoviesTumbler));
+    savedMoviesInputValue.length === 0 ? setSuccessSearch(false) : setSuccessSearch(true);
+    setFilterSavedCards(newArray);
   }
 
   // Автоматическое определение размера экрана
   window.onresize = () => {
-    if (window.innerWidth > 1279) {
-      setAddShowCards(3);
+    if (window.innerWidth > LARGE) {
+      setAddShowCards(AddShowCardsAtLarge);
     } else {
-      setAddShowCards(2);
+      setAddShowCards(AddShowCardsAtMedium);
     }
   };
 
@@ -336,6 +360,7 @@ function App() {
                   loggedIn={loggedIn}
                   isPreloader={preloader}
                   searchValue={savedMoviesInputValue}
+                  successSearch={successSearch}
                 />
               </ProtectedRoute>
             }
@@ -359,28 +384,38 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/signin"
-            element={
-              <Login
-                errorMesage={errorMesage}
-                handleSubmit={authorization}
-                isPreloader={preloader}
-                blockInput={blockInput}
-              />
-            }
-          />
-          <Route
-            path="/signup"
-            element={
-              <Register
-                errorMesage={errorMesage}
-                handleSubmit={registration}
-                isPreloader={preloader}
-                blockInput={blockInput}
-              />
-            }
-          />
+          {loggedIn ? (
+            <Route path="/signin" element={<Navigate replace to="/" />} />
+          ) : (
+            <Route
+              exact
+              path="/signin"
+              element={
+                <Login
+                  errorMesage={errorMesage}
+                  handleSubmit={authorization}
+                  isPreloader={preloader}
+                  blockInput={blockInput}
+                />
+              }
+            />
+          )}
+          {loggedIn ? (
+            <Route path="/signup" element={<Navigate replace to="/" />} />
+          ) : (
+            <Route
+              exact
+              path="/signup"
+              element={
+                <Register
+                  errorMesage={errorMesage}
+                  handleSubmit={registration}
+                  isPreloader={preloader}
+                  blockInput={blockInput}
+                />
+              }
+            />
+          )}
           <Route path="*" element={<Error />} />
         </Routes>
       </section>

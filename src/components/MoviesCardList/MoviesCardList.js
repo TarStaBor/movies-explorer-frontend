@@ -1,7 +1,7 @@
 import "./MoviesCardList.css";
 import More from "../More/More";
 import MoviesCard from "../MoviesCard/MoviesCard";
-import { useState, useEffect } from "react";
+import { SHORT } from "../../utils/constants";
 
 function MoviesCardList(props) {
   const {
@@ -15,21 +15,8 @@ function MoviesCardList(props) {
     addShowCards,
   } = props;
 
-  const [moreButton, setMoreButton] = useState(true);
-
-  // Эффект отображения кнопки "Еще"
-  useEffect(() => {
-    if (filterCards.length <= amountShowCards) {
-      setMoreButton(false);
-    } else {
-      setMoreButton(true);
-    }
-  }, [filterCards, amountShowCards]);
-
-  // Фильтрация по состоянию тумблера
-  // eslint-disable-next-line array-callback-return
   let tumblerFilteredArray = filterCards.filter((card) => {
-    if (!tumbler || (tumbler && card.duration <= 40)) {
+    if (!tumbler || (tumbler && card.duration <= SHORT)) {
       return card;
     }
   });
@@ -42,7 +29,7 @@ function MoviesCardList(props) {
           {tumblerFilteredArray.slice(0, amountShowCards).map((card) => {
             return (
               <MoviesCard
-                key={card._id}
+                key={card.id}
                 card={card}
                 handleSaveFilm={handleSaveFilm}
                 handleDeleteFilm={handleDeleteFilm}
@@ -52,7 +39,7 @@ function MoviesCardList(props) {
           })}
         </ul>
       </section>
-      {moreButton && (
+      {amountShowCards <= tumblerFilteredArray.length && (
         <More setAmountShowCards={setAmountShowCards} amountShowCards={amountShowCards} addShowCards={addShowCards} />
       )}
     </>

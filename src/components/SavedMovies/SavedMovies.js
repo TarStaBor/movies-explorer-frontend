@@ -20,6 +20,7 @@ function SavedMovies(props) {
     loggedIn,
     isPreloader,
     searchValue,
+    successSearch,
   } = props;
 
   return (
@@ -34,10 +35,10 @@ function SavedMovies(props) {
         arrayforSearch={saveCards}
         searchValue={searchValue}
       />
-      {filterSavedCards && (
+      {saveCards && (
         <MoviesCardList
           tumbler={tumbler}
-          filterCards={filterSavedCards}
+          filterCards={successSearch ? filterSavedCards : saveCards}
           saveCards={saveCards}
           handleSaveFilm={handleSaveFilm}
           handleDeleteFilm={handleDeleteFilm}
