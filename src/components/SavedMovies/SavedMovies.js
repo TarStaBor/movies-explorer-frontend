@@ -6,16 +6,16 @@ import Preloader from "../Preloader/Preloader";
 
 function SavedMovies(props) {
   const {
-    filterSavedCards,
-    tumbler,
-    setTumbler,
     handleFilter,
     setSavedMoviesInputValue,
-    amountShowCards,
-    setAmountShowCards,
-    addShowCards,
     handleDeleteFilm,
     handleSaveFilm,
+    setAmountShowCards,
+    setTumbler,
+    filterSavedCards,
+    tumbler,
+    amountShowCards,
+    addShowCards,
     saveCards,
     loggedIn,
     isPreloader,

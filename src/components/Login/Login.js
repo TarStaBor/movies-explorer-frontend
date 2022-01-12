@@ -10,7 +10,7 @@ function Login(props) {
 
   function Submite(evt) {
     evt.preventDefault();
-    handleSubmit(values["email"], values["password"]);
+    handleSubmit(values.email, values.password);
   }
 
   return (
@@ -27,7 +27,7 @@ function Login(props) {
           <p className="login__text">E-mail</p>
 
           <input
-            className={`login__input ${errors.email !== "" && `login__input_type_error`}`}
+            className={`login__input ${errors.email && `login__input_type_error`}`}
             type="email"
             name="email"
             onChange={handleChange}
@@ -39,13 +39,13 @@ function Login(props) {
             disabled={blockInput && "disabled"}
           />
 
-          <p className={`login__error-text ${errors.email === "" && `login__error-text_type_disabled`}`}>
-            {errors["email"] ? errors["email"] : "⁣"}
+          <p className={`login__error-text ${!errors.email && `login__error-text_type_disabled`}`}>
+            {errors.email ? errors.email : "⁣"}
           </p>
 
           <p className="login__text">Пароль</p>
           <input
-            className={`login__input ${errors.password !== "" && `login__input_type_error`}`}
+            className={`login__input ${errors.password && `login__input_type_error`}`}
             type="password"
             name="password"
             onChange={handleChange}
@@ -54,8 +54,8 @@ function Login(props) {
             required
             disabled={blockInput && "disabled"}
           />
-          <p className={`login__error-text ${errors.password === "" && `login__error-text_type_disabled`}`}>
-            {errors["password"] ? errors["password"] : "⁣"}
+          <p className={`login__error-text ${!errors.password && `login__error-text_type_disabled`}`}>
+            {errors.password ? errors.password : "⁣"}
           </p>
         </div>
         <div className="login__submit">

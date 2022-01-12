@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React from "react";
 import { CurrentUserContext } from "../../contexts/Context";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useNavigate } from "react-router";
@@ -27,34 +27,55 @@ function App() {
   const navigate = useNavigate();
 
   // Стейт  регистрации
-  const [loggedIn, setLoggedIn] = useState(true);
+  const [loggedIn, setLoggedIn] = React.useState(true);
 
   // Стейт актуального пользователя
-  const [currentUser, setCurrentUser] = useState({});
+  const [currentUser, setCurrentUser] = React.useState({});
 
   // Стейт карточек из BeatFilm
-  const [cards, setCards] = useState([]);
+  const [cards, setCards] = React.useState([]);
 
   // Стейт карточек из нашего API
-  const [saveCards, setSaveCards] = useState([]);
+  const [saveCards, setSaveCards] = React.useState([]);
 
   // Стейт отфильтрованных карточек
-  const [filterCards, setFilterCards] = useState([]);
+  const [filterCards, setFilterCards] = React.useState([]);
 
   // Стейт избранных отфильтрованных карточек
-  const [filterSavedCards, setFilterSavedCards] = useState([]);
+  const [filterSavedCards, setFilterSavedCards] = React.useState([]);
 
   // Стейт прелодера
-  const [preloader, setPreloader] = useState(false);
+  const [preloader, setPreloader] = React.useState(false);
 
   // Стейт сообщения с ошибкой при обращении к MainApi
-  const [errorMesage, setErrorMesage] = useState("");
+  const [errorMesage, setErrorMesage] = React.useState("");
 
   // Стейт просмотра/редактирования профиля
-  const [edit, setEdit] = useState(false);
+  const [edit, setEdit] = React.useState(false);
+
+  // Стейт содержимого инпута в Movies
+  const [moviesInputValue, setMoviesInputValue] = React.useState("");
+
+  // Стейт содержимого инпута в SavedMovies
+  const [savedMoviesInputValue, setSavedMoviesInputValue] = React.useState("");
+
+  // Стейт блокировки инпута
+  const [blockInput, setBlockInput] = React.useState(false);
+
+  // Стейт состояния тумблера в Movies
+  const [moviesTumbler, setMoviesTumbler] = React.useState(false);
+
+  // Стейт состояния тумблера в SavedMovies
+  const [savedMoviesTumbler, setSavedMoviesTumbler] = React.useState(false);
+
+  // Стейт успешного изменения профиля
+  const [successEditProfile, setSuccessEditProfile] = React.useState(false);
+
+  // Стейт успешного поиска по избранным фильмам
+  const [successSearch, setSuccessSearch] = React.useState(false);
 
   // Стейт количества карточек для показа
-  const [amountShowCards, setAmountShowCards] = useState(
+  const [amountShowCards, setAmountShowCards] = React.useState(
     window.innerWidth > LARGE
       ? AmountShowCardsAtLarge
       : window.innerWidth > MEDIUM
@@ -63,61 +84,30 @@ function App() {
   );
 
   // Стейт количества карточек для добавления
-  const [addShowCards, setAddShowCards] = useState(
+  const [addShowCards, setAddShowCards] = React.useState(
     window.innerWidth > LARGE ? AddShowCardsAtLarge : AddShowCardsAtMedium
   );
 
-  // Стейт содержимого инпута в Movies
-  const [moviesInputValue, setMoviesInputValue] = useState("");
-
-  // Стейт содержимого инпута в SavedMovies
-  const [savedMoviesInputValue, setSavedMoviesInputValue] = useState("");
-
-  // Стейт блокировки инпута
-  const [blockInput, setBlockInput] = useState(false);
-
-  // Стейт состояния тумблера в Movies
-  const [moviesTumbler, setMoviesTumbler] = useState(false);
-
-  // Стейт состояния тумблера в SavedMovies
-  const [savedMoviesTumbler, setSavedMoviesTumbler] = useState(false);
-
-  // Стейт успешного изменения профиля
-  const [successEditProfile, setSuccessEditProfile] = useState(false);
-
-  // Стейт успешного поиска по избранным фильмам
-  const [successSearch, setSuccessSearch] = useState(false);
-
   // Эффекты при монтировании App.js
-  useEffect(() => {
-    //обновить отфильтрованные карточки из локального хранилища
+  React.useEffect(() => {
     setFilterCards(JSON.parse(localStorage.getItem("filterCards")));
-
-    // //обновить избранные отфильтрованные карточки из локального хранилища
-    // setFilterSavedCards(JSON.parse(localStorage.getItem("filterSavedCards")));
-
-    //обновить положение чекбокса из локального хранилища для Movies
     setMoviesTumbler(JSON.parse(localStorage.getItem("moviesTumbler")));
-
-    //обновить положение чекбокса из локального хранилища для SavedMovies
     setSavedMoviesTumbler(JSON.parse(localStorage.getItem("savedMoviesTumbler")));
-
-    //обновить содержимое инпута для Movies
     setMoviesInputValue(JSON.parse(localStorage.getItem("moviesInputValue")));
   }, []);
 
   // Эффект проверки что инпут пустой
-  useEffect(() => {
+  React.useEffect(() => {
     savedMoviesInputValue.length === 0 && setSuccessSearch(false);
   }, [savedMoviesInputValue]);
 
   // Эффект сохранения положения тумблера
-  useEffect(() => {
+  React.useEffect(() => {
     localStorage.setItem("moviesTumbler", JSON.stringify(moviesTumbler));
   }, [moviesTumbler]);
 
   // Эффект проверки авторизации на сайте
-  useEffect(() => {
+  React.useEffect(() => {
     if (loggedIn) {
       MainApi.getUserInfo(localStorage.token)
         .then(() => {
@@ -131,8 +121,8 @@ function App() {
   }, [loggedIn]);
 
   // Эффект получения информации о пользователе
-  useEffect(() => {
-    if (loggedIn === true) {
+  React.useEffect(() => {
+    if (loggedIn) {
       MainApi.getUserInfo()
         .then((userData) => {
           setCurrentUser(userData);
@@ -144,7 +134,7 @@ function App() {
   }, [loggedIn]);
 
   // Эффект получения избранных фильмов
-  useEffect(() => {
+  React.useEffect(() => {
     MainApi.getFilms()
       .then((cards) => {
         setSaveCards(cards);
@@ -155,7 +145,7 @@ function App() {
   }, []);
 
   // Эффект запроса карточек от BeatFilms
-  useEffect(() => {
+  React.useEffect(() => {
     api
       .getListCard()
       .then((cards) => {
@@ -166,9 +156,9 @@ function App() {
       });
   }, []);
 
-  // Функция очистки localStirage при выходе
-  function handleloggedOutClick(e) {
-    e.preventDefault();
+  // Функция очистки localStorage при выходе
+  function handleloggedOutClick(evt) {
+    evt.preventDefault();
     localStorage.removeItem("filterCards");
     localStorage.removeItem("moviesTumbler");
     localStorage.removeItem("savedMoviesTumbler");
@@ -202,8 +192,8 @@ function App() {
     setBlockInput(true);
     MainApi.deleteFilm(card)
       .then(() => {
-        setSaveCards(saveCards.filter((m) => m._id !== card._id));
-        setFilterSavedCards(saveCards.filter((m) => m._id !== card._id));
+        setSaveCards(saveCards.filter((saveCard) => saveCard._id !== card._id));
+        setFilterSavedCards(saveCards.filter((saveCard) => saveCard._id !== card._id));
       })
       .catch((err) => {
         console.log(err);
@@ -322,16 +312,16 @@ function App() {
             element={
               <ProtectedRoute loggedIn={loggedIn}>
                 <Movies
-                  tumbler={moviesTumbler}
-                  setTumbler={setMoviesTumbler}
-                  filterCards={filterCards}
                   handleFilter={handleMoviesFilter}
                   setMoviesInputValue={setMoviesInputValue}
-                  amountShowCards={amountShowCards}
-                  setAmountShowCards={setAmountShowCards}
-                  addShowCards={addShowCards}
                   handleDeleteFilm={handleDeleteFilm}
                   handleSaveFilm={handleSaveFilm}
+                  setAmountShowCards={setAmountShowCards}
+                  setTumbler={setMoviesTumbler}
+                  tumbler={moviesTumbler}
+                  filterCards={filterCards}
+                  amountShowCards={amountShowCards}
+                  addShowCards={addShowCards}
                   saveCards={saveCards}
                   loggedIn={loggedIn}
                   isPreloader={preloader}
@@ -346,16 +336,16 @@ function App() {
             element={
               <ProtectedRoute loggedIn={loggedIn}>
                 <SavedMovies
-                  filterSavedCards={filterSavedCards}
-                  tumbler={savedMoviesTumbler}
-                  setTumbler={setSavedMoviesTumbler}
                   handleFilter={handleSavedMoviesFilter}
                   setSavedMoviesInputValue={setSavedMoviesInputValue}
-                  amountShowCards={amountShowCards}
-                  setAmountShowCards={setAmountShowCards}
-                  addShowCards={addShowCards}
                   handleDeleteFilm={handleDeleteFilm}
                   handleSaveFilm={handleSaveFilm}
+                  setAmountShowCards={setAmountShowCards}
+                  setTumbler={setSavedMoviesTumbler}
+                  filterSavedCards={filterSavedCards}
+                  tumbler={savedMoviesTumbler}
+                  amountShowCards={amountShowCards}
+                  addShowCards={addShowCards}
                   saveCards={saveCards}
                   loggedIn={loggedIn}
                   isPreloader={preloader}
@@ -371,15 +361,15 @@ function App() {
               <ProtectedRoute loggedIn={loggedIn}>
                 <Profile
                   setEdit={setEdit}
+                  handleUpdateUser={handleUpdateUser}
+                  handleloggedOutClick={handleloggedOutClick}
+                  setSuccessEditProfile={setSuccessEditProfile}
                   edit={edit}
                   errorMesage={errorMesage}
-                  handleUpdateUser={handleUpdateUser}
                   loggedIn={loggedIn}
-                  handleloggedOutClick={handleloggedOutClick}
                   isPreloader={preloader}
                   blockInput={blockInput}
                   successEditProfile={successEditProfile}
-                  setSuccessEditProfile={setSuccessEditProfile}
                 />
               </ProtectedRoute>
             }

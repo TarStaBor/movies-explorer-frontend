@@ -1,5 +1,4 @@
 import React from "react";
-import { useEffect } from "react";
 import { CurrentUserContext } from "../../contexts/Context";
 import "./Profile.css";
 import Header from "../Header/Header";
@@ -9,15 +8,15 @@ import Preloader from "../Preloader/Preloader";
 function Profile(props) {
   const {
     setEdit,
+    handleUpdateUser,
+    handleloggedOutClick,
+    setSuccessEditProfile,
     edit,
     errorMesage,
-    handleUpdateUser,
     loggedIn,
-    handleloggedOutClick,
     isPreloader,
     blockInput,
     successEditProfile,
-    setSuccessEditProfile,
   } = props;
 
   const currentUser = React.useContext(CurrentUserContext);
@@ -32,25 +31,23 @@ function Profile(props) {
   function handleSubmit(evt) {
     evt.preventDefault();
 
-    handleUpdateUser(
-      values["name"] ? values["name"] : currentUser.name,
-      values["email"] ? values["email"] : currentUser.email
-    );
+    handleUpdateUser(values.name ? values.name : currentUser.name, values.email ? values.email : currentUser.email);
   }
 
   // Эффект очистки состояния стейта успешного редактирования после размонтирования компонента
-  useEffect(() => {
-    values["name"] = currentUser.name;
-    values["email"] = currentUser.email;
+  React.useEffect(() => {
+    values.name = currentUser.name;
+    values.email = currentUser.email;
     return () => {
       setSuccessEditProfile(false);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Эффект скрытия сообщения об успешном изменении при повторном нажатии на редактирование
-  useEffect(() => {
+  React.useEffect(() => {
     edit && setSuccessEditProfile(false);
-  }, [edit]);
+  }, [edit, setSuccessEditProfile]);
 
   return (
     <>
@@ -60,8 +57,8 @@ function Profile(props) {
         <form className="profile__form">
           <h2 className="profile__title">Привет, {currentUser.name}!</h2>
           <div className="profile__container">
-            <p className={`profile__error-text ${errors.name === "" && `profile__error-text_type_disabled`}`}>
-              {errors["name"] ? errors["name"] : "⁣"}
+            <p className={`profile__error-text ${!errors.name && `profile__error-text_type_disabled`}`}>
+              {errors.name ? errors.name : "⁣"}
             </p>
             <div className="profile__form-element">
               <p className="profile__text">Имя</p>
@@ -95,8 +92,8 @@ function Profile(props) {
                 disabled={(!edit || blockInput) && "disabled"}
               />
             </div>
-            <p className={`profile__error-text ${errors.email === "" && `profile__error-text_type_disabled`}`}>
-              {errors["email"] ? errors["email"] : "⁣"}
+            <p className={`profile__error-text ${!errors.email && `profile__error-text_type_disabled`}`}>
+              {errors.email ? errors.email : "⁣"}
             </p>
           </div>
           <div className="profile__exit">

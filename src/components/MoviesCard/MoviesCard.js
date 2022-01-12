@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React from "react";
 import "./MoviesCard.css";
 import active from "../../images/selecter_active.svg";
 import disactive from "../../images/selecter_disactive.svg";
@@ -11,9 +11,9 @@ function MoviesCard(props) {
   const imgUrl = pathName === "/movies" ? "https://api.nomoreparties.co" + card.image.url : card.image;
 
   //Стейт лайка карточки
-  const [isLike, setIsLike] = useState(false);
+  const [isLike, setIsLike] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     saveCards.map((saveCard) => {
       if (saveCard.movieId === card.id) {
         setIsLike(true);
@@ -51,7 +51,7 @@ function MoviesCard(props) {
           </button>
         ) : (
           <button
-            className={`moviesCard__selecter ${isLike === true && "moviesCard__selecter_type_save"} link-opacity`}
+            className={`moviesCard__selecter ${isLike && "moviesCard__selecter_type_save"} link-opacity`}
             onClick={() => {
               if (isLike) {
                 handleDeleteFilm(saveCards.find((saveCard) => saveCard.movieId === card.id));

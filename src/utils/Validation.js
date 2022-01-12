@@ -1,5 +1,4 @@
 import React from "react";
-import { useCallback } from "react";
 
 //хук управления формой и валидации формы
 
@@ -17,7 +16,7 @@ export function Validation() {
     setIsValid(target.closest("form").checkValidity());
   };
 
-  const resetForm = useCallback(
+  const resetForm = React.useCallback(
     (newValues = {}, newErrors = {}, newIsValid = false) => {
       setValues(newValues);
       setErrors(newErrors);

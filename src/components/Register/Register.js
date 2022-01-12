@@ -9,7 +9,7 @@ function Register(props) {
   const { values, handleChange, errors, isValid } = Validation();
   function Submite(evt) {
     evt.preventDefault();
-    handleSubmit(values["name"], values["email"], values["password"]);
+    handleSubmit(values.name, values.email, values.password);
   }
 
   return (
@@ -25,7 +25,7 @@ function Register(props) {
         <div className="register__container">
           <p className="register__text">Имя</p>
           <input
-            className={`register__input ${errors.name !== "" && `register__input_type_error`}`}
+            className={`register__input ${errors.name && `register__input_type_error`}`}
             type="name"
             name="name"
             onChange={handleChange}
@@ -36,12 +36,12 @@ function Register(props) {
             autoComplete="off"
             disabled={blockInput && "disabled"}
           />
-          <p className={`register__error-text ${errors.name === "" && `register__error-text_type_disabled`}`}>
-            {errors["name"] ? errors["name"] : "⁣"}
+          <p className={`register__error-text ${!errors.name && `register__error-text_type_disabled`}`}>
+            {errors.name ? errors.name : "⁣"}
           </p>
           <p className="register__text">E-mail</p>
           <input
-            className={`register__input ${errors.email !== "" && `register__input_type_error`}`}
+            className={`register__input ${errors.email && `register__input_type_error`}`}
             type="email"
             name="email"
             onChange={handleChange}
@@ -51,12 +51,12 @@ function Register(props) {
             required
             disabled={blockInput && "disabled"}
           />
-          <p className={`register__error-text ${errors.email === "" && `register__error-text_type_disabled`}`}>
-            {errors["email"] ? errors["email"] : "⁣"}
+          <p className={`register__error-text ${!errors.email && `register__error-text_type_disabled`}`}>
+            {errors.email ? errors.email : "⁣"}
           </p>
           <p className="register__text">Пароль</p>
           <input
-            className={`register__input ${errors.password !== "" && `register__input_type_error`}`}
+            className={`register__input ${errors.password && `register__input_type_error`}`}
             type="password"
             name="password"
             onChange={handleChange}
@@ -65,8 +65,8 @@ function Register(props) {
             required
             disabled={blockInput && "disabled"}
           />
-          <p className={`register__error-text ${errors.password === "" && `register__error-text_type_disabled`}`}>
-            {errors["password"] ? errors["password"] : "⁣"}
+          <p className={`register__error-text ${!errors.password && `register__error-text_type_disabled`}`}>
+            {errors.password ? errors.password : "⁣"}
           </p>
         </div>
         <div className="register__submit">
