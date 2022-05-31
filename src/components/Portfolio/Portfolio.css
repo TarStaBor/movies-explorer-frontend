@@ -40,13 +40,18 @@
 }
 
 .portfolio__box-title {
-  color: #fff;
+  color: #c0c0c0;
   margin: 0;
   font-style: normal;
   font-weight: normal;
   font-size: 30px;
   line-height: 50px;
   letter-spacing: -0.04em;
+}
+
+.portfolio__box-span {
+  color: #fff;
+  font-weight: 500;
 }
 
 .portfolio__box-arrow {
