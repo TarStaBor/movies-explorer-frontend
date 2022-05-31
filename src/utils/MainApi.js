@@ -1,7 +1,7 @@
 export const BASE_URL = "https://api.film-explorer.nomoredomains.rocks";
 export const BEATFILM_URL = "https://api.nomoreparties.co";
 
-// метод обработки ответа сервера
+// Response processing
 async function getResponseData(result) {
   const res = await result.json();
   if (result.ok) {
@@ -10,8 +10,6 @@ async function getResponseData(result) {
     return Promise.reject(res);
   }
 }
-
-//Регистрация
 
 export const register = (name, email, password) => {
   return fetch(`${BASE_URL}/signup`, {
@@ -34,8 +32,6 @@ export const register = (name, email, password) => {
     });
 };
 
-//Авторизация
-
 export const authorize = (email, password) => {
   return fetch(`${BASE_URL}/signin`, {
     method: "POST",
@@ -52,8 +48,6 @@ export const authorize = (email, password) => {
       return data;
     });
 };
-
-//Получить данные пользователя
 
 export const getUserInfo = (token) => {
   return fetch(`${BASE_URL}/users/me`, {
@@ -73,7 +67,6 @@ export const getUserInfo = (token) => {
     });
 };
 
-// изменить данные пользователя (PATCH)
 export const patchUserInfo = (name, email) => {
   return fetch(`${BASE_URL}/users/me`, {
     method: "PATCH",
@@ -95,8 +88,6 @@ export const patchUserInfo = (name, email) => {
       }
     });
 };
-
-// Добавить фильм в избранные
 
 export const saveFilm = (card) => {
   return fetch(`${BASE_URL}/movies`, {
@@ -128,8 +119,6 @@ export const saveFilm = (card) => {
     });
 };
 
-// Получить избранные фильмы
-
 export const getFilms = () => {
   return fetch(`${BASE_URL}/movies`, {
     method: "GET",
@@ -146,8 +135,6 @@ export const getFilms = () => {
       return data;
     });
 };
-
-// Удалить фильм из избранного
 
 export const deleteFilm = (card) => {
   return fetch(`${BASE_URL}/movies/${card._id}`, {
