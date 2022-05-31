@@ -14,8 +14,8 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "deploy": "npm run build && scp -r ./build/* tarstabor@51.250.17.71:/home/tarstabor/movies-explorer-frontend",
+    "start": "set PORT=3015 && react-scripts start",
+    "deploy": "npm run build && scp -r ./build/* tarstabor@185.5.251.34:/srv/movies-explorer/movies-explorer-frontend",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
