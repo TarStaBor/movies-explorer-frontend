@@ -23,7 +23,6 @@
   padding: 0;
   width: 100%;
   grid-template-columns: repeat(3, 364px);
-  /* grid-template-rows: repeat(4, 271px); */
   row-gap: 30px;
 }
 
@@ -31,7 +30,6 @@
   .moviesCardList__container {
     margin: 70px 0 30px;
     grid-template-columns: repeat(2, 339px);
-    /* grid-template-rows: repeat(4, 258px); */
     row-gap: 36px;
   }
 }
@@ -41,7 +39,6 @@
     margin: 40px 0 30px;
     justify-content: center;
     grid-template-columns: repeat(1, 300px);
-    /* grid-template-rows: repeat(4, 236px); */
     row-gap: 16px;
   }
 }

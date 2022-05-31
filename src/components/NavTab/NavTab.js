@@ -10,7 +10,10 @@ function NavTab() {
         Технологии
       </a>
       <a href="#aboutMe" className="navTab__link link-opacity">
-        Студент
+        О себе
+      </a>
+      <a href="#portfolio" className="navTab__link link-opacity">
+        Портфолио
       </a>
     </section>
   );

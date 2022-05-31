@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { CurrentUserContext } from "../../contexts/Context";
 import "./Profile.css";
 import Header from "../Header/Header";
@@ -7,11 +7,11 @@ import Preloader from "../Preloader/Preloader";
 
 function Profile(props) {
   const {
-    setEdit,
+    setEditProfile,
     handleUpdateUser,
     handleloggedOutClick,
     setSuccessEditProfile,
-    edit,
+    editProfile,
     errorMesage,
     loggedIn,
     isPreloader,
@@ -19,35 +19,30 @@ function Profile(props) {
     successEditProfile,
   } = props;
 
-  const currentUser = React.useContext(CurrentUserContext);
-
+  const currentUser = useContext(CurrentUserContext);
   const { values, handleChange, errors, isValid } = Validation();
 
   function handleEdit(e) {
     e.preventDefault();
-    setEdit(true);
+    setEditProfile(true);
   }
 
   function handleSubmit(evt) {
     evt.preventDefault();
-
     handleUpdateUser(values.name ? values.name : currentUser.name, values.email ? values.email : currentUser.email);
   }
 
-  // Эффект очистки состояния стейта успешного редактирования после размонтирования компонента
-  React.useEffect(() => {
+  useEffect(() => {
     values.name = currentUser.name;
     values.email = currentUser.email;
     return () => {
       setSuccessEditProfile(false);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Эффект скрытия сообщения об успешном изменении при повторном нажатии на редактирование
-  React.useEffect(() => {
-    edit && setSuccessEditProfile(false);
-  }, [edit, setSuccessEditProfile]);
+  useEffect(() => {
+    editProfile && setSuccessEditProfile(false);
+  }, [editProfile, setSuccessEditProfile]);
 
   return (
     <>
@@ -73,7 +68,7 @@ function Profile(props) {
                 required
                 autoComplete="off"
                 defaultValue={currentUser.name}
-                disabled={(!edit || blockInput) && "disabled"}
+                disabled={(!editProfile || blockInput) && "disabled"}
               />
             </div>
             <div className="profile__form-element">
@@ -89,7 +84,7 @@ function Profile(props) {
                 pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}$"
                 required
                 defaultValue={currentUser.email}
-                disabled={(!edit || blockInput) && "disabled"}
+                disabled={(!editProfile || blockInput) && "disabled"}
               />
             </div>
             <p className={`profile__error-text ${!errors.email && `profile__error-text_type_disabled`}`}>
@@ -98,7 +93,7 @@ function Profile(props) {
           </div>
           <div className="profile__exit">
             {successEditProfile && <p className="profile__successMessage">Профиль изменен успешно</p>}
-            {!edit ? (
+            {!editProfile ? (
               <button className="profile__button link-opacity" onClick={handleEdit}>
                 Редактировать
               </button>

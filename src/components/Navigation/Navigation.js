@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { NavLink } from "react-router-dom";
 import "./Navigation.css";
 import profile from "../../images/profile.svg";
@@ -7,8 +7,8 @@ import PopupBurger from "../PopupBurger/PopupBurger";
 import { LARGE } from "../../utils/constants";
 
 function Navigation() {
-  const [isMobile, setIsMobile] = React.useState(window.innerWidth <= LARGE);
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= LARGE);
+  const [isOpen, setIsOpen] = useState(false);
 
   const setActive = ({ isActive }) =>
     isActive ? "navigation__link link-opacity navigation__link_active" : "navigation__link link-opacity";
@@ -17,15 +17,14 @@ function Navigation() {
     setIsOpen(true);
   }
 
-  const updateWidth = React.useCallback(() => {
+  const updateWidth = useCallback(() => {
     const newWidth = window.innerWidth <= LARGE;
     if (newWidth !== isMobile) {
       setIsMobile(newWidth);
     }
   }, [isMobile]);
 
-  // Слушаем и обновляем ширину экрана
-  React.useEffect(() => {
+  useEffect(() => {
     window.addEventListener("resize", updateWidth);
     return () => window.removeEventListener("resize", updateWidth);
   }, [updateWidth]);

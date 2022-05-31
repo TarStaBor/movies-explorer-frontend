@@ -27,7 +27,7 @@
 
 @media screen and (min-width: 320px) and (max-width: 767px) {
   .navTab__link {
-    margin-right: 25px;
+    margin-right: 20px;
     font-size: 11px;
     line-height: 16px;
   }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./MoviesCard.css";
 import active from "../../images/selecter_active.svg";
 import disactive from "../../images/selecter_disactive.svg";
@@ -10,10 +10,9 @@ function MoviesCard(props) {
   const pathName = window.location.pathname;
   const imgUrl = pathName === "/movies" ? "https://api.nomoreparties.co" + card.image.url : card.image;
 
-  //Стейт лайка карточки
-  const [isLike, setIsLike] = React.useState(false);
+  const [isLike, setIsLike] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     saveCards.map((saveCard) => {
       if (saveCard.movieId === card.id) {
         setIsLike(true);
@@ -21,7 +20,6 @@ function MoviesCard(props) {
     });
   }, [saveCards]);
 
-  // function setAllCards
   function prepareDuration(minutes) {
     if (minutes > 60) {
       return ((minutes / 60) | 0) + "ч " + (minutes % 60) + "м";

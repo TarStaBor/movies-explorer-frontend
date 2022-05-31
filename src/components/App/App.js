@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { CurrentUserContext } from "../../contexts/Context";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useNavigate } from "react-router";
@@ -24,58 +24,28 @@ import {
 } from "../../utils/constants";
 
 function App() {
+  // BeatFilm cards
+  const [cards, setCards] = useState([]);
+  // Our cards
+  const [saveCards, setSaveCards] = useState([]);
+  const [loggedIn, setLoggedIn] = useState(true);
+  const [currentUser, setCurrentUser] = useState({});
+  const [filterCards, setFilterCards] = useState([]);
+  const [filterSavedCards, setFilterSavedCards] = useState([]);
+  const [preloader, setPreloader] = useState(false);
+  const [errorMesage, setErrorMesage] = useState("");
+  const [editProfile, setEditProfile] = useState(false);
+  const [successEditProfile, setSuccessEditProfile] = useState(false);
+  const [moviesInputValue, setMoviesInputValue] = useState("");
+  const [savedMoviesInputValue, setSavedMoviesInputValue] = useState("");
+  const [blockInput, setBlockInput] = useState(false);
+  const [moviesTumbler, setMoviesTumbler] = useState(false);
+  const [savedMoviesTumbler, setSavedMoviesTumbler] = useState(false);
+  const [successSearch, setSuccessSearch] = useState(false);
+
   const navigate = useNavigate();
 
-  // Стейт  регистрации
-  const [loggedIn, setLoggedIn] = React.useState(true);
-
-  // Стейт актуального пользователя
-  const [currentUser, setCurrentUser] = React.useState({});
-
-  // Стейт карточек из BeatFilm
-  const [cards, setCards] = React.useState([]);
-
-  // Стейт карточек из нашего API
-  const [saveCards, setSaveCards] = React.useState([]);
-
-  // Стейт отфильтрованных карточек
-  const [filterCards, setFilterCards] = React.useState([]);
-
-  // Стейт избранных отфильтрованных карточек
-  const [filterSavedCards, setFilterSavedCards] = React.useState([]);
-
-  // Стейт прелодера
-  const [preloader, setPreloader] = React.useState(false);
-
-  // Стейт сообщения с ошибкой при обращении к MainApi
-  const [errorMesage, setErrorMesage] = React.useState("");
-
-  // Стейт просмотра/редактирования профиля
-  const [edit, setEdit] = React.useState(false);
-
-  // Стейт содержимого инпута в Movies
-  const [moviesInputValue, setMoviesInputValue] = React.useState("");
-
-  // Стейт содержимого инпута в SavedMovies
-  const [savedMoviesInputValue, setSavedMoviesInputValue] = React.useState("");
-
-  // Стейт блокировки инпута
-  const [blockInput, setBlockInput] = React.useState(false);
-
-  // Стейт состояния тумблера в Movies
-  const [moviesTumbler, setMoviesTumbler] = React.useState(false);
-
-  // Стейт состояния тумблера в SavedMovies
-  const [savedMoviesTumbler, setSavedMoviesTumbler] = React.useState(false);
-
-  // Стейт успешного изменения профиля
-  const [successEditProfile, setSuccessEditProfile] = React.useState(false);
-
-  // Стейт успешного поиска по избранным фильмам
-  const [successSearch, setSuccessSearch] = React.useState(false);
-
-  // Стейт количества карточек для показа
-  const [amountShowCards, setAmountShowCards] = React.useState(
+  const [amountShowCards, setAmountShowCards] = useState(
     window.innerWidth > LARGE
       ? AmountShowCardsAtLarge
       : window.innerWidth > MEDIUM
@@ -83,31 +53,26 @@ function App() {
       : AmountShowCardsAtShort
   );
 
-  // Стейт количества карточек для добавления
-  const [addShowCards, setAddShowCards] = React.useState(
+  const [addShowCards, setAddShowCards] = useState(
     window.innerWidth > LARGE ? AddShowCardsAtLarge : AddShowCardsAtMedium
   );
 
-  // Эффекты при монтировании App.js
-  React.useEffect(() => {
+  useEffect(() => {
     setFilterCards(JSON.parse(localStorage.getItem("filterCards")));
     setMoviesTumbler(JSON.parse(localStorage.getItem("moviesTumbler")));
     setSavedMoviesTumbler(JSON.parse(localStorage.getItem("savedMoviesTumbler")));
     setMoviesInputValue(JSON.parse(localStorage.getItem("moviesInputValue")));
   }, []);
 
-  // Эффект проверки что инпут пустой
-  React.useEffect(() => {
+  useEffect(() => {
     savedMoviesInputValue.length === 0 && setSuccessSearch(false);
   }, [savedMoviesInputValue]);
 
-  // Эффект сохранения положения тумблера
-  React.useEffect(() => {
+  useEffect(() => {
     localStorage.setItem("moviesTumbler", JSON.stringify(moviesTumbler));
   }, [moviesTumbler]);
 
-  // Эффект проверки авторизации на сайте
-  React.useEffect(() => {
+  useEffect(() => {
     if (loggedIn) {
       MainApi.getUserInfo(localStorage.token)
         .then(() => {
@@ -120,8 +85,7 @@ function App() {
     }
   }, [loggedIn]);
 
-  // Эффект получения информации о пользователе
-  React.useEffect(() => {
+  useEffect(() => {
     if (loggedIn) {
       MainApi.getUserInfo()
         .then((userData) => {
@@ -133,19 +97,8 @@ function App() {
     }
   }, [loggedIn]);
 
-  // Эффект получения избранных фильмов
-  React.useEffect(() => {
-    MainApi.getFilms()
-      .then((cards) => {
-        setSaveCards(cards);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
-  // Эффект запроса карточек от BeatFilms
-  React.useEffect(() => {
+  // Request BeatFilms Movies
+  useEffect(() => {
     api
       .getListCard()
       .then((cards) => {
@@ -156,7 +109,17 @@ function App() {
       });
   }, []);
 
-  // Функция очистки localStorage при выходе
+  // Request our films
+  useEffect(() => {
+    MainApi.getFilms()
+      .then((cards) => {
+        setSaveCards(cards);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
   function handleloggedOutClick(evt) {
     evt.preventDefault();
     localStorage.removeItem("filterCards");
@@ -169,7 +132,6 @@ function App() {
     navigate("/", { replace: false });
   }
 
-  // Функция добавления в избранные
   function handleSaveFilm(card) {
     setPreloader(true);
     setBlockInput(true);
@@ -186,7 +148,6 @@ function App() {
       });
   }
 
-  // Функция удаления из избранного
   function handleDeleteFilm(card) {
     setPreloader(true);
     setBlockInput(true);
@@ -204,7 +165,6 @@ function App() {
       });
   }
 
-  // Функция запроса к АПИ на регистрацию
   function registration(name, email, password) {
     setPreloader(true);
     setBlockInput(true);
@@ -224,7 +184,6 @@ function App() {
       });
   }
 
-  // Функция запроса к АПИ на авторизацию
   function authorization(email, password) {
     setPreloader(true);
     setBlockInput(true);
@@ -245,7 +204,6 @@ function App() {
       });
   }
 
-  // Функция изменения профайла
   function handleUpdateUser(name, email) {
     setPreloader(true);
     setBlockInput(true);
@@ -253,12 +211,12 @@ function App() {
       .then((response) => {
         setCurrentUser(response);
         setErrorMesage("");
-        setEdit(false);
+        setEditProfile(false);
         setSuccessEditProfile(true);
       })
       .catch((err) => {
         setErrorMesage(err.message);
-        setEdit(true);
+        setEditProfile(true);
         setSuccessEditProfile(false);
       })
       .finally(() => {
@@ -267,9 +225,8 @@ function App() {
       });
   }
 
-  // Функция фильтрации карточек в Movies по ключевому слову
+  // Filtering BeatFilms movies
   function handleMoviesFilter(arrayforSearch) {
-    // eslint-disable-next-line array-callback-return
     const newArray = arrayforSearch.filter((card) => {
       if (card.nameRU.toLowerCase().includes(moviesInputValue)) {
         return card;
@@ -281,9 +238,8 @@ function App() {
     localStorage.setItem("moviesTumbler", JSON.stringify(moviesTumbler));
   }
 
-  // Функция фильтрации карточек в SavedMovies по ключевому слову
+  // Filtering selected movies
   function handleSavedMoviesFilter(arrayforSearch) {
-    // eslint-disable-next-line array-callback-return
     const newArray = arrayforSearch.filter((card) => {
       if (card.nameRU.toLowerCase().includes(savedMoviesInputValue)) {
         return card;
@@ -293,7 +249,6 @@ function App() {
     setFilterSavedCards(newArray);
   }
 
-  // Автоматическое определение размера экрана
   window.onresize = () => {
     if (window.innerWidth > LARGE) {
       setAddShowCards(AddShowCardsAtLarge);
@@ -360,11 +315,11 @@ function App() {
             element={
               <ProtectedRoute loggedIn={loggedIn}>
                 <Profile
-                  setEdit={setEdit}
+                  setEditProfile={setEditProfile}
                   handleUpdateUser={handleUpdateUser}
                   handleloggedOutClick={handleloggedOutClick}
                   setSuccessEditProfile={setSuccessEditProfile}
-                  edit={edit}
+                  editProfile={editProfile}
                   errorMesage={errorMesage}
                   loggedIn={loggedIn}
                   isPreloader={preloader}
@@ -375,7 +330,7 @@ function App() {
             }
           />
           {loggedIn ? (
-            <Route path="/signin" element={<Navigate replace to="/" />} />
+            <Route path="/signin" element={<Navigate replace to="/movies" />} />
           ) : (
             <Route
               exact
@@ -391,7 +346,7 @@ function App() {
             />
           )}
           {loggedIn ? (
-            <Route path="/signup" element={<Navigate replace to="/" />} />
+            <Route path="/signup" element={<Navigate replace to="/movies" />} />
           ) : (
             <Route
               exact
