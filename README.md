@@ -18,7 +18,7 @@ This project is the React SPA that helps users to search and save loved movies
 
 ## Watch the demo
 
-[![my diploma video demo](./src/images/demo.png)]()
+[![my diploma video demo](./src/images/demo.png)](https://youtu.be/3rW4iBoSLqE)
 
 ---
 
